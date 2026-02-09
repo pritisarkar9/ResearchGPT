@@ -7,13 +7,13 @@ router = APIRouter()
 UPLOAD_DIR = "data/papers"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
-@router.post("/upload")
+@router.post("/upload-pdf")
 async def upload_pdf(file: UploadFile = File(...)):
-    path = os.path.join(UPLOAD_DIR, file.filename)
+    file_path = os.path.join(UPLOAD_DIR, file.filename)
 
-    with open(path, "wb") as f:
+    with open(file_path, "wb") as f:
         f.write(await file.read())
 
-    ingest_pdf(path)
+    ingest_pdf(file_path)
 
-    return {"status": "uploaded and indexed"}
+    return {"status": "document indexed"}

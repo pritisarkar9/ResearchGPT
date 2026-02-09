@@ -1,18 +1,20 @@
+import os
 from langchain_community.document_loaders import PyPDFLoader
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-from app.db.vector_store import save_vectorstore
-from app.core.config import get_settings
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+from app.db.vector_store import create_vectorstore
 
-settings = get_settings()
+UPLOAD_DIR = "data/papers"
+os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 def ingest_pdf(path: str):
     loader = PyPDFLoader(path)
-    documents = loader.load()
+    docs = loader.load()
 
     splitter = RecursiveCharacterTextSplitter(
-        chunk_size=settings.CHUNK_SIZE,
-        chunk_overlap=settings.CHUNK_OVERLAP
+        chunk_size=800,
+        chunk_overlap=150
     )
 
-    docs = splitter.split_documents(documents)
-    return save_vectorstore(docs)
+    split_docs = splitter.split_documents(docs)
+
+    return create_vectorstore(split_docs)

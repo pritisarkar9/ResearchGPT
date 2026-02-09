@@ -1,15 +1,11 @@
-from langchain.prompts import PromptTemplate
 from app.db.vector_store import get_vectorstore
-from app.core.llm_provider import get_llm
-from app.core.config import get_settings
-
-settings = get_settings()
+from app.core.groq_client import get_llm
+from langchain_core.prompts import PromptTemplate
 
 PROMPT = PromptTemplate(
     template="""
-You are a research assistant.
-Answer ONLY using the context below.
-If answer not found say: "Not found in document".
+Answer ONLY from the provided context.
+If answer not found say: Not found in document.
 
 Context:
 {context}
@@ -22,12 +18,14 @@ Answer:
     input_variables=["context", "question"]
 )
 
-def ask_question(question: str):
+def ask_document(question: str):
     db = get_vectorstore()
+
     if not db:
         return {"answer": "No document uploaded", "sources": []}
 
-    docs = db.similarity_search(question, k=settings.TOP_K)
+    docs = db.similarity_search(question, k=4)
+
     context = "\n\n".join([d.page_content for d in docs])
 
     llm = get_llm()
@@ -35,7 +33,4 @@ def ask_question(question: str):
 
     sources = [f"page {d.metadata.get('page', '?')}" for d in docs]
 
-    return {
-        "answer": response.content,
-        "sources": sources
-    }
+    return {"answer": response.content, "sources": sources}
