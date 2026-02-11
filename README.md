@@ -149,7 +149,7 @@ research-gpt/
 
 ### 1. Clone Repo
 ```bash
-git clone https://github.com/yourusername/research-gpt.git
+git clone https://github.com/yourusername/ResearchGPT
 cd research-gpt/backend
 2. Create Virtual Environment
 Windows
